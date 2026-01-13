@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="de">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Lotto Zahlengenerator</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+        padding: 20px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+
+      .container {
+        background: white;
+        border-radius: 15px;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+        padding: 40px;
+        max-width: 600px;
+        width: 100%;
+      }
+
+      h1 {
+        color: #667eea;
+        text-align: center;
+        margin-bottom: 30px;
+        font-size: 2.5em;
+      }
+
+      .control-section {
+        background: #f8f9fa;
+        padding: 20px;
+        border-radius: 10px;
+        margin-bottom: 30px;
+      }
+
+      .input-group {
+        display: flex;
+        gap: 10px;
+        margin-bottom: 15px;
+      }
+
+      input[type="number"] {
+        flex: 1;
+        padding: 12px;
+        border: 2px solid #e0e0e0;
+        border-radius: 8px;
+        font-size: 1em;
+        transition: border-color 0.3s;
+      }
+
+      input[type="number"]:focus {
+        outline: none;
+        border-color: #667eea;
+      }
+
+      button {
+        padding: 12px 24px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border: none;
+        border-radius: 8px;
+        font-size: 1em;
+        font-weight: bold;
+        cursor: pointer;
+        transition: transform 0.2s, box-shadow 0.2s;
+      }
+
+      button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+      }
+
+      button:active {
+        transform: translateY(0);
+      }
+
+      button.secondary {
+        background: #6c757d;
+        margin-top: 10px;
+        width: 100%;
+      }
+
+      button.danger {
+        background: #dc3545;
+      }
+
+      .button-group {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+      }
+
+      .button-group button {
+        flex: 1;
+        min-width: 100px;
+      }
+
+      .results-section {
+        margin-bottom: 30px;
+      }
+
+      .results-section h2 {
+        color: #333;
+        font-size: 1.3em;
+        margin-bottom: 15px;
+        border-bottom: 2px solid #667eea;
+        padding-bottom: 10px;
+      }
+
+      .generated-numbers {
+        background: #f0f4ff;
+        padding: 20px;
+        border-radius: 10px;
+        margin-bottom: 15px;
+        min-height: 60px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+
+      .numbers {
+        font-size: 1.5em;
+        font-weight: bold;
+        color: #667eea;
+        flex: 1;
+      }
+
+      .bonus {
+        background: #ffc107;
+        padding: 10px 15px;
+        border-radius: 8px;
+        font-weight: bold;
+        color: #333;
+        text-align: center;
+      }
+
+      .combinations-list {
+        max-height: 400px;
+        overflow-y: auto;
+        border: 2px solid #e0e0e0;
+        border-radius: 10px;
+        padding: 10px;
+      }
+
+      .combination-item {
+        background: white;
+        padding: 15px;
+        margin-bottom: 10px;
+        border-left: 4px solid #667eea;
+        border-radius: 5px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        transition: background-color 0.2s;
+      }
+
+      .combination-item:hover {
+        background-color: #f8f9fa;
+      }
+
+      .combination-info {
+        flex: 1;
+      }
+
+      .combination-numbers {
+        font-size: 1.1em;
+        font-weight: bold;
+        color: #667eea;
+        margin-bottom: 5px;
+      }
+
+      .combination-date {
+        font-size: 0.85em;
+        color: #666;
+      }
+
+      .delete-btn {
+        background: #dc3545;
+        padding: 8px 12px;
+        border-radius: 5px;
+        font-size: 0.9em;
+        cursor: pointer;
+      }
+
+      .delete-btn:hover {
+        background: #c82333;
+      }
+
+      .empty-state {
+        text-align: center;
+        color: #999;
+        padding: 20px;
+      }
+
+      .info-box {
+        background: #e7f3ff;
+        border-left: 4px solid #667eea;
+        padding: 15px;
+        border-radius: 5px;
+        margin-bottom: 20px;
+        color: #333;
+      }
+
+      .info-box strong {
+        color: #667eea;
+      }
+
+      .stats {
+        display: flex;
+        gap: 10px;
+        margin-top: 15px;
+        flex-wrap: wrap;
+      }
+
+      .stat-box {
+        background: #fff3cd;
+        padding: 10px 15px;
+        border-radius: 5px;
+        font-size: 0.9em;
+        flex: 1;
+        min-width: 150px;
+      }
+
+      .stat-box strong {
+        color: #856404;
+      }
+
+      /* Scrollbar Styling */
+      .combinations-list::-webkit-scrollbar {
+        width: 8px;
+      }
+
+      .combinations-list::-webkit-scrollbar-track {
+        background: #f1f1f1;
+        border-radius: 10px;
+      }
+
+      .combinations-list::-webkit-scrollbar-thumb {
+        background: #667eea;
+        border-radius: 10px;
+      }
+
+      .combinations-list::-webkit-scrollbar-thumb:hover {
+        background: #764ba2;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>🎰 Lotto Generator</h1>
+
+      <div class="info-box">
+        <strong>Wie es funktioniert:</strong> Generiere Lotto-Zahlen und speichere
+        sie lokal ab. Alle Kombinationen werden automatisch gespeichert und
+        bleiben erhalten, auch nach dem Neuladen der Seite.
+      </div>
+
+      <div class="control-section">
+        <h3 style="margin-bottom: 15px; color: #333">Einstellungen</h3>
+
+        <div style="background: #fff3cd; padding: 12px; border-radius: 8px; margin-bottom: 15px; border-left: 4px solid #ffc107;">
+          <label style="display: flex; align-items: center; gap: 10px; cursor: pointer; margin: 0;">
+            <input
+              type="checkbox"
+              id="smartFiltersToggle"
+              checked
+              onchange="toggleSmartFilters()"
+              style="width: 18px; height: 18px; cursor: pointer;"
+            />
+            <span style="color: #333; font-weight: 500;">🎯 Intelligente Filter aktivieren</span>
+          </label>
+          <p style="font-size: 0.85em; color: #666; margin-top: 8px; margin-bottom: 0;">
+            Vermeidet Zahlenfolgen, Geburtstage und andere häufig gespielte Muster
+          </p>
+        </div>
+
+        <div class="input-group">
+          <input
+            type="number"
+            id="countInput"
+            min="1"
+            max="50"
+            value="1"
+            placeholder="Anzahl der Kombinationen"
+          />
+          <button onclick="generateNumbers()">Generieren</button>
+        </div>
+
+        <div class="button-group">
+          <button class="secondary" onclick="generateMultiple()">
+            10 Kombinationen
+          </button>
+          <button class="secondary danger" onclick="clearAll()">
+            Alle löschen
+          </button>
+        </div>
+      </div>
+
+      <div class="results-section" id="resultsSection" style="display: none">
+        <h2>Zuletzt generiert</h2>
+        <div class="generated-numbers">
+          <div class="numbers" id="lastNumbers">-</div>
+          <div class="bonus">Bonus: <span id="lastBonus">-</span></div>
+        </div>
+      </div>
+
+      <div class="results-section">
+        <h2>
+          Gespeicherte Kombinationen
+          <span style="color: #999; font-size: 0.8em" id="count">(0)</span>
+        </h2>
+        <div class="combinations-list" id="combinationsList">
+          <div class="empty-state">Noch keine Kombinationen generiert</div>
+        </div>
+        <div class="stats" id="stats"></div>
+      </div>
+    </div>
+
+    <script src="lotto.js"></script>
+    <script>
+      // Initialisierung
+      const generator = new LottoGenerator(6, 49, 10);
+      updateDisplay();
+
+      function toggleSmartFilters() {
+        const enabled = document.getElementById("smartFiltersToggle").checked;
+        generator.setSmartFilters(enabled);
+        const status = enabled ? "✓ Aktiv" : "✗ Deaktiviert";
+        console.log("Intelligente Filter: " + status);
+      }
+
+      function generateNumbers() {
+        const count = parseInt(
+          document.getElementById("countInput").value || 1
+        );
+        if (count < 1 || count > 50) {
+          alert("Bitte geben Sie eine Anzahl zwischen 1 und 50 ein");
+          return;
+        }
+
+        const combinations = generator.generateAndSave(count);
+        displayLastGenerated(combinations[combinations.length - 1]);
+        updateDisplay();
+        document.getElementById("countInput").value = 1;
+      }
+
+      function generateMultiple() {
+        const combinations = generator.generateAndSave(10);
+        displayLastGenerated(combinations[combinations.length - 1]);
+        updateDisplay();
+      }
+
+      function displayLastGenerated(combination) {
+        document.getElementById("resultsSection").style.display = "block";
+        document.getElementById("lastNumbers").textContent =
+          combination.numbers.join(" - ");
+        document.getElementById("lastBonus").textContent = combination.bonus;
+      }
+
+      function updateDisplay() {
+        const combinations = generator.getAllCombinations();
+        const listElement = document.getElementById("combinationsList");
+
+        // Update count
+        document.getElementById("count").textContent = `(${combinations.length})`;
+
+        if (combinations.length === 0) {
+          listElement.innerHTML =
+            '<div class="empty-state">Noch keine Kombinationen generiert</div>';
+          document.getElementById("stats").innerHTML = "";
+          return;
+        }
+
+        // Display combinations
+        listElement.innerHTML = combinations
+          .sort((a, b) => b.id - a.id)
+          .map(
+            (combo) => `
+          <div class="combination-item">
+            <div class="combination-info">
+              <div class="combination-numbers">${combo.numbers.join(" - ")} | Bonus: <strong>${combo.bonus}</strong></div>
+              <div class="combination-date">${new Date(combo.timestamp).toLocaleString("de-DE")}</div>
+            </div>
+            <button class="delete-btn" onclick="deleteCombination(${combo.id})">×</button>
+          </div>
+        `
+          )
+          .join("");
+
+        // Display stats
+        displayStats(combinations);
+      }
+
+      function displayStats(combinations) {
+        const totalCombinations = combinations.length;
+        const firstDate = new Date(combinations[0].timestamp);
+        const lastDate = new Date(combinations[combinations.length - 1].timestamp);
+
+        const statsHTML = `
+          <div class="stat-box">
+            <strong>Gesamt:</strong> ${totalCombinations} Kombinationen
+          </div>
+          <div class="stat-box">
+            <strong>Erste:</strong> ${firstDate.toLocaleString("de-DE")}
+          </div>
+          <div class="stat-box">
+            <strong>Letzte:</strong> ${lastDate.toLocaleString("de-DE")}
+          </div>
+        `;
+        document.getElementById("stats").innerHTML = statsHTML;
+      }
+
+      function deleteCombination(id) {
+        if (confirm("Wirklich löschen?")) {
+          generator.deleteCombination(id);
+          updateDisplay();
+        }
+      }
+
+      function clearAll() {
+        if (
+          confirm(
+            "Alle " + generator.getAllCombinations().length + " Kombinationen wirklich löschen?"
+          )
+        ) {
+          generator.clearCombinations();
+          document.getElementById("resultsSection").style.display = "none";
+          updateDisplay();
+        }
+      }
+
+      // Enter-Taste zum Generieren
+      document
+        .getElementById("countInput")
+        .addEventListener("keypress", function (e) {
+          if (e.key === "Enter") generateNumbers();
+        });
+    </script>
+  </body>
+</html>
